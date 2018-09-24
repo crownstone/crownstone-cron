@@ -6,9 +6,9 @@ const fetch        = require('node-fetch');
 
 function hourlyInvoke() {
 
-
   let headers     = {'Content-Type': 'application/x-www-form-urlencoded'};
   let fetchConfig = {method: 'GET', headers};
+
   console.log("Starting...")
   util.promiseBatchPerformer(scheduledTasks, (task) => { return evaluate(task) })
     .then(() => {
