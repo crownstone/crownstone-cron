@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+
+const hourlyInvoke = require("../src/hourlyInvoke");
+
+# run my invocation!
+hourlyInvoke();
