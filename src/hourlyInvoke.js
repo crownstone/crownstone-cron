@@ -12,7 +12,7 @@ function hourlyInvoke() {
   console.log("Starting...")
   util.promiseBatchPerformer(scheduledTasks, (task) => { return evaluate(task) })
     .then(() => {
-      console.log("Ran successfully", err)
+      console.log("Ran successfully")
       fetch(config.snitchUrl + '?m="Success."', fetchConfig);
     })
     .catch((err) => {
