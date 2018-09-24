@@ -1,5 +1,6 @@
 let MongoDbConnector = require('./MongoDbConnector');
 let config           = require('./config/config.' + (process.env.NODE_ENV || 'local'));
+const fetch          = require('node-fetch');
 
 function execute(task) {
   console.log("ScheduledJob: Setting up execution of", task.id, "...");
