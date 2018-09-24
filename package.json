@@ -2,7 +2,6 @@
   "name": "crownstone-cron",
   "version": "1.0.0",
   "description": "Cronjobs for the Crownstone Cloud",
-  "main": "index.js",
   "author": "",
   "license": "MIT",
   "dependencies": {

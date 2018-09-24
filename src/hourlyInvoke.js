@@ -8,7 +8,7 @@ function hourlyInvoke() {
   let config      = require('./config/config.' + (process.env.NODE_ENV || 'local'));
   let headers     = {'Content-Type': 'application/x-www-form-urlencoded'};
   let fetchConfig = {method: 'GET', headers};
-
+  console.log("Starting...")
   util.promiseBatchPerformer(scheduledTasks, (task) => { return evaluate(task) })
     .then(() => {
       fetch(config.snitchUrl + '?m="Success."', fetchConfig);
