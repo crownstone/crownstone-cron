@@ -1,4 +1,5 @@
 let MongoDbConnector = require('./MongoDbConnector');
+let config           = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
 function execute(task) {
   console.log("ScheduledJob: Setting up execution of", task.id, "...");
@@ -25,9 +26,13 @@ function evaluate(task, forceExecute = false) {
     let timeSinceLastTrigger = (now % (everyNHours*3600000))
 
     if (timeSinceLastTrigger < 3600000 || forceExecute) {
+      console.log("Executing task:", task.id);
+      fetch(config.snitchUrl + '?m="Executing:' + task.id + '"', fetchConfig);
       execute(task).then(() => { resolve() })
     }
     else {
+      console.log("Skipping task:", task.id);
+      fetch(config.snitchUrl + '?m="Skipping:' + task.id + '"', fetchConfig);
       resolve();
     }
   })
