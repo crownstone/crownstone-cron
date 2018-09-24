@@ -2,5 +2,5 @@
 
 const hourlyInvoke = require("../src/hourlyInvoke");
 
-# run my invocation!
+// run my invocation!
 hourlyInvoke();
