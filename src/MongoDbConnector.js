@@ -1,7 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
-let datasources = require('./config/config.' + (process.env.NODE_ENV || 'local'));
+let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
 let Logger = require('le_node');
 let logger = new Logger({ token: config.logEntries });
@@ -16,7 +16,7 @@ class MongoDbConnector {
 
   connect() {
     return new Promise((resolve, reject) => {
-      let url = datasources.mongoDs.url;
+      let url = config.mongoDs.url;
 
       // Use connect method to connect to the server
       MongoClient.connect(url, (err, client) => {
@@ -24,8 +24,8 @@ class MongoDbConnector {
 
         logger.info("ScheduledJob: Connected successfully to mongo server");
 
-        this.userDb = client.db(datasources.userDs.name);
-        this.dataDb = client.db(datasources.mongoDs.name);
+        this.userDb = client.db(config.userDs.name);
+        this.dataDb = client.db(config.mongoDs.name);
 
         this.mongoClient = client;
         resolve();
