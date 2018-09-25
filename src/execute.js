@@ -3,22 +3,23 @@ let config           = require('./config/config.' + (process.env.NODE_ENV || 'lo
 const fetch          = require('node-fetch');
 
 let Logger = require('le_node');
-let logger = new Logger({ token: config.logEntries });
+let logger = new Logger({ token: config.logEntries, console: true, minLevel: 1 });
 
 function execute(task) {
-  logger.info("ScheduledJob: Setting up execution of", task.id, "...");
+  logger.info("ScheduledJob: Setting up execution of " +  task.id + "...");
   let mongo = new MongoDbConnector();
   return mongo.connect()
     .then(() => {
-      logger.info("ScheduledJob: Executing:", task.id);
+      logger.info("ScheduledJob: Executing: " + task.id);
       return task.action(mongo);
     })
     .then(() => {
-      logger.info("ScheduledJob: Finished:", task.id);
+      logger.info("ScheduledJob: Finished: "+ task.id);
       mongo.close();
     })
     .catch((err) => {
-      logger.info("ScheduledJob: Failed:", task.id, err);
+      logger.err("ScheduledJob: Failed: " + task.id);
+      logger.err(err);
       mongo.close();
     })
 }
@@ -30,11 +31,11 @@ function evaluate(task, forceExecute = false) {
     let timeSinceLastTrigger = (now % (everyNHours*3600000))
 
     if (timeSinceLastTrigger < 3600000 || forceExecute) {
-      logger.info("Executing task:", task.id);
+      logger.info("Executing task: " + task.id);
       execute(task).then(() => { resolve() })
     }
     else {
-      logger.info("Skipping task:", task.id);
+      logger.info("Skipping task: " + task.id);
       resolve();
     }
   })
