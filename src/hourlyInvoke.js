@@ -1,8 +1,10 @@
-let util           = require('./util/util')
-let scheduledTasks = require('./scheduledTasks')
-let evaluate       = require('./execute')
-let headers        = {'Content-Type': 'application/x-www-form-urlencoded'};
-let fetchConfig    = {method: 'GET', headers};
+let util           = require('./util/util');
+let scheduledTasks = require('./scheduledTasks');
+let evaluate       = require('./execute');
+
+const headers        = {'Content-Type': 'application/x-www-form-urlencoded'};
+const fetchConfig    = {method: 'GET', headers};
+const fetch        = require('node-fetch');
 
 let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
