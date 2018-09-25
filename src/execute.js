@@ -35,7 +35,6 @@ function evaluate(task, forceExecute = false) {
     }
     else {
       logger.info("Skipping task:", task.id);
-      fetch(config.snitchUrl + '?m="Skipping:' + task.id + '"', fetchConfig);
       resolve();
     }
   })

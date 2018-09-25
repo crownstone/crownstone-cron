@@ -9,7 +9,7 @@ const fetch        = require('node-fetch');
 let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
 let Logger = require('le_node');
-let logger = new Logger({ token: config.logEntries });
+let logger = new Logger({ token: config.logEntries, console: true, minLevel: 1 });
 
 function hourlyInvoke() {
   logger.info("Starting...", new Date().valueOf())
@@ -19,7 +19,9 @@ function hourlyInvoke() {
       fetch(config.snitchUrl + '?m=Successful', fetchConfig);
     })
     .catch((err) => {
-      logger.info("Failing with errors...", err)
+      console.log(err)
+      logger.err("Failing with errors")
+      logger.err(err)
       fetch(config.snitchUrl + '?m=Failed', fetchConfig);
     })
 
