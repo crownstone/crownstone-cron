@@ -4,6 +4,8 @@ let evaluate       = require('./execute')
 let headers        = {'Content-Type': 'application/x-www-form-urlencoded'};
 let fetchConfig    = {method: 'GET', headers};
 
+let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
+
 let Logger = require('le_node');
 let logger = new Logger({ token: config.logEntries });
 
