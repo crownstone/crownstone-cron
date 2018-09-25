@@ -31,4 +31,5 @@ module.exports = {
     clientSecret: process.env.TOON_CLIENT_SECRET
   },
   snitchUrl: process.env.SNITCH_URL,
+  logEntries: process.env.LOG_ENTRIES_TOKEN
 };

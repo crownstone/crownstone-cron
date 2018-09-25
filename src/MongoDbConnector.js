@@ -3,7 +3,8 @@ const assert = require('assert');
 
 let datasources = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
-
+let Logger = require('le_node');
+let logger = new Logger({ token: config.logEntries });
 
 class MongoDbConnector {
 
@@ -21,7 +22,7 @@ class MongoDbConnector {
       MongoClient.connect(url, (err, client) => {
         if ( err ) { return reject(err); }
 
-        console.log("ScheduledJob: Connected successfully to mongo server");
+        logger.info("ScheduledJob: Connected successfully to mongo server");
 
         this.userDb = client.db(datasources.userDs.name);
         this.dataDb = client.db(datasources.mongoDs.name);

@@ -1,23 +1,24 @@
 let MongoDbConnector = require('./MongoDbConnector');
 let config           = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 const fetch          = require('node-fetch');
-let headers          = {'Content-Type': 'application/x-www-form-urlencoded'};
-let fetchConfig      = {method: 'GET', headers};
+
+let Logger = require('le_node');
+let logger = new Logger({ token: config.logEntries });
 
 function execute(task) {
-  console.log("ScheduledJob: Setting up execution of", task.id, "...");
+  logger.info("ScheduledJob: Setting up execution of", task.id, "...");
   let mongo = new MongoDbConnector();
   return mongo.connect()
     .then(() => {
-      console.log("ScheduledJob: Executing:", task.id);
+      logger.info("ScheduledJob: Executing:", task.id);
       return task.action(mongo);
     })
     .then(() => {
-      console.log("ScheduledJob: Finished:", task.id);
+      logger.info("ScheduledJob: Finished:", task.id);
       mongo.close();
     })
     .catch((err) => {
-      console.log("ScheduledJob: Failed:", task.id, err);
+      logger.info("ScheduledJob: Failed:", task.id, err);
       mongo.close();
     })
 }
@@ -29,12 +30,11 @@ function evaluate(task, forceExecute = false) {
     let timeSinceLastTrigger = (now % (everyNHours*3600000))
 
     if (timeSinceLastTrigger < 3600000 || forceExecute) {
-      console.log("Executing task:", task.id);
-      fetch(config.snitchUrl + '?m="Executing:' + task.id + '"', fetchConfig);
+      logger.info("Executing task:", task.id);
       execute(task).then(() => { resolve() })
     }
     else {
-      console.log("Skipping task:", task.id);
+      logger.info("Skipping task:", task.id);
       fetch(config.snitchUrl + '?m="Skipping:' + task.id + '"', fetchConfig);
       resolve();
     }
