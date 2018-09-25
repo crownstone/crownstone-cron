@@ -2,8 +2,7 @@ let MongoDbConnector = require('./MongoDbConnector');
 let config           = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 const fetch          = require('node-fetch');
 
-let Logger = require('le_node');
-let logger = new Logger({ token: config.logEntries, console: true, minLevel: 1 });
+const logger = require("./loggerInstance")
 
 function execute(task) {
   logger.info("ScheduledJob: Setting up execution of " +  task.id + "...");

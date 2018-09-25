@@ -3,8 +3,7 @@ const assert = require('assert');
 
 let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
-let Logger = require('le_node');
-let logger = new Logger({ token: config.logEntries, console: true, minLevel: 1 });
+const logger = require("./loggerInstance")
 
 class MongoDbConnector {
 
