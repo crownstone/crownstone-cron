@@ -10,22 +10,22 @@ let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
 const logger = require("./loggerInstance")
 
-function hourlyInvoke() {
+function hourlyInvoke(forceExecute = false) {
   logger.info("Starting...", new Date().valueOf())
   logger.once('connected', () => {
     logger.info("Connected...", new Date().valueOf())
     util.promiseBatchPerformer(scheduledTasks, (task) => {
-      return evaluate(task)
+      return evaluate(task, forceExecute)
     })
       .then(() => {
         logger.info("Ran successfully")
-        fetch(config.snitchUrl + '?m=Successful', fetchConfig);
+        return fetch(config.snitchUrl + '?m=Successful', fetchConfig);
       })
       .catch((err) => {
         console.log(err)
         logger.err("Failing with errors")
         logger.err(err)
-        fetch(config.snitchUrl + '?m=Failed', fetchConfig);
+        return fetch(config.snitchUrl + '?m=Failed', fetchConfig);
       })
       .then(() => {
         logger.once('buffer drain', () => {

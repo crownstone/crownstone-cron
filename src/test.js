@@ -3,4 +3,4 @@
 const hourlyInvoke = require("./hourlyInvoke");
 
 // run my invocation!
-hourlyInvoke();
+hourlyInvoke(true);
