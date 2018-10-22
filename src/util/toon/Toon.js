@@ -66,6 +66,9 @@ const ToonAPI = {
         return res.json();
       })
       .then((tokens) => {
+        if (tokens.refresh_token === undefined) {
+          throw "Could not get Token";
+        }
         let tokenData = {
           refreshToken: tokens.refresh_token,
           accessToken: tokens.access_token,

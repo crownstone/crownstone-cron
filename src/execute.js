@@ -14,12 +14,12 @@ function execute(task) {
     })
     .then(() => {
       logger.info("ScheduledJob: Finished: "+ task.id);
-      mongo.close();
+      return mongo.close();
     })
     .catch((err) => {
       logger.err("ScheduledJob: Failed: " + task.id);
       logger.err(err);
-      mongo.close();
+      return mongo.close();
     })
 }
 

@@ -33,7 +33,7 @@ class MongoDbConnector {
   }
 
   close() {
-    this.mongoClient.close();
+    return this.mongoClient.close();
   }
 }
 

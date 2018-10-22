@@ -22,12 +22,12 @@ function hourlyInvoke(forceExecute = false) {
         return fetch(config.snitchUrl + '?m=Successful', fetchConfig);
       })
       .catch((err) => {
-        console.log(err)
         logger.err("Failing with errors")
         logger.err(err)
         return fetch(config.snitchUrl + '?m=Failed', fetchConfig);
       })
       .then(() => {
+        logger.notice({ type: 'server', event: 'shutdown' });
         logger.once('buffer drain', () => {
           logger.closeConnection();
           logger.on('disconnected', () => {
