@@ -23,6 +23,9 @@ function refreshToonSchedules(mongo) {
                 }
               );
             })
+            .then(() => {
+              logger.info("ToonScheduledJob: Finished job: " + toon._id);
+            })
             .catch((err) => {
               logger.info("ToonScheduledJob: Failed to execute: " + toon._id);
               resolve();
