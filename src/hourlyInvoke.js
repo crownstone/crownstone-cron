@@ -11,22 +11,23 @@ let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 const logger = require("./loggerInstance")
 
 function hourlyInvoke(forceExecute = false) {
-  logger.info("Starting...", new Date().valueOf())
+  logger.info(new Date().valueOf() + " Starting...", new Date().valueOf())
   logger.once('connected', () => {
-    logger.info("Connected...", new Date().valueOf())
+    logger.info(new Date().valueOf() + " Connected...", new Date().valueOf())
     util.promiseBatchPerformer(scheduledTasks, (task) => {
       return evaluate(task, forceExecute)
     })
       .then(() => {
-        logger.info("Ran successfully")
+        logger.info(new Date().valueOf() + " Ran successfully")
         return fetch(config.snitchUrl + '?m=Successful', fetchConfig);
       })
       .catch((err) => {
-        logger.err("Failing with errors")
-        logger.err(err)
+        logger.info(new Date().valueOf() + " Failing with errors")
+        logger.info(err)
         return fetch(config.snitchUrl + '?m=Failed', fetchConfig);
       })
       .then(() => {
+        logger.info(new Date().valueOf() + " Shutting down logger");
         logger.notice({ type: 'server', event: 'shutdown' });
         logger.once('buffer drain', () => {
           logger.closeConnection();

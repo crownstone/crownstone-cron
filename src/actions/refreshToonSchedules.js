@@ -24,10 +24,11 @@ function refreshToonSchedules(mongo) {
               );
             })
             .then(() => {
-              logger.info("ToonScheduledJob: Finished job: " + toon._id);
+              logger.info(new Date().valueOf() + " ToonScheduledJob: Finished job: " + toon._id);
             })
             .catch((err) => {
-              logger.info("ToonScheduledJob: Failed to execute: " + toon._id);
+              logger.info(new Date().valueOf() + " ToonScheduledJob: Failed to execute: " + toon._id);
+              console.log("ERR; ToonScheduledJob: ",err)
               resolve();
             })
         })
@@ -35,7 +36,12 @@ function refreshToonSchedules(mongo) {
         .then(() => {
           resolveAll();
         })
+        .catch((err) => {
+          logger.info(new Date().valueOf() + " ToonScheduledJob: Major Error");
+          logger.info(err);
 
+          rejectAll(err);
+        })
     })
   })
 

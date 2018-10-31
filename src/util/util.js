@@ -26,4 +26,4 @@ const Util = {
   },
 }
 
-module.exports = Util
+module.exports = Util;

@@ -21,7 +21,7 @@ class MongoDbConnector {
       MongoClient.connect(url, (err, client) => {
         if ( err ) { return reject(err); }
 
-        logger.info("ScheduledJob: Connected successfully to mongo server");
+        logger.info(new Date().valueOf() + " ScheduledJob: Connected successfully to mongo server");
 
         this.userDb = client.db(config.userDs.name);
         this.dataDb = client.db(config.mongoDs.name);
