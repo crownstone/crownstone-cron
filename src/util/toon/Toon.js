@@ -8,6 +8,8 @@ const localConfig = require('../../config/config.' + (process.env.NODE_ENV || 'l
 const ToonUtil    = require('./ToonUtil');
 const mongodb     = require('mongodb');
 
+const logger = require("../../loggerInstance")
+
 /**
  *
  "programState": 1  // following the schedule
@@ -67,10 +69,14 @@ const ToonAPI = {
       })
       .then((tokens) => {
         if (tokens.refresh_token === undefined) {
+          logger.info(JSON.stringify(tokens));
           throw "Could not get Token";
         }
         let tokenData = {
           refreshToken: tokens.refresh_token,
+          refreshTokenTTL: tokens.refresh_token_expires_in,
+          refreshTokenUpdatedAt: new Date().valueOf(),
+          refreshTokenUpdatedFrom: "cronjobs",
           accessToken: tokens.access_token,
           toonId: toonId,
         }

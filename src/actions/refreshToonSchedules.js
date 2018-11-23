@@ -17,8 +17,19 @@ function refreshToonSchedules(mongo) {
             .then((schedule) => {
               return toonCollection.updateOne(
                 { _id: toon._id},
-                { refreshToken: tokens.refreshToken, schedule: JSON.stringify(schedule), updatedScheduleTime: new Date().valueOf() },
+                { $set: {
+                    refreshToken            : tokens.refreshToken,
+                    refreshTokenTTL         : tokens.refreshTokenTTL,
+                    refreshTokenUpdatedAt   : tokens.refreshTokenUpdatedAt,
+                    refreshTokenUpdatedFrom : tokens.refreshTokenUpdatedFrom + "_refreshToonSchedules",
+                    schedule: JSON.stringify(schedule),
+                    updatedScheduleTime: new Date().valueOf()
+                  },
+                },
                 ( err, result ) => {
+                  if (err) {
+                    logger.info(new Date().valueOf() + " ToonScheduledJob: ERROR DURING job: " + toon._id);
+                  }
                   resolve();
                 }
               );
