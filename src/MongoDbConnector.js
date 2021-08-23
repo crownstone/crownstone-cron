@@ -18,7 +18,7 @@ class MongoDbConnector {
       let url = config.mongoDs.url;
 
       // Use connect method to connect to the server
-      MongoClient.connect(url, (err, client) => {
+      MongoClient.connect(url, {useNewUrlParser:true}, (err, client) => {
         if ( err ) { return reject(err); }
 
         logger.info(new Date().valueOf() + " ScheduledJob: Connected successfully to mongo server");

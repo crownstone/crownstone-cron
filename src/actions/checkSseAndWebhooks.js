@@ -111,14 +111,14 @@ async function checkSseAndWebhooks(mongo) {
     let now = Date.now();
     logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on SSE...");
     while (Date.now() - now < config.waitTime && checker.sse === false) {
-      Util.wait(100);
+      await Util.wait(100);
     }
     if (checker.sse === false) { throw "NO_SSE_RECEIVED"; }
 
     logger.info(new Date().valueOf() + " SseAndWebhooks: SSE received.");
     logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on Hook...");
     while (Date.now() - now < config.waitTime && checker.hook === false) {
-      Util.wait(100);
+      await Util.wait(100);
     }
 
     if (checker.hook === false) { throw "NO_HOOK_RECEIVED"; }
@@ -137,6 +137,11 @@ async function checkSseAndWebhooks(mongo) {
     console.log("Something went wrong... :(", err);
     throw err;
   }
+
+  logger.info(new Date().valueOf() + " SseAndWebhooks: Stopping SSE...");
+  await sse.stop();
+  logger.info(new Date().valueOf() + " SseAndWebhooks: SSE stopped.");
+
 
 
 }
