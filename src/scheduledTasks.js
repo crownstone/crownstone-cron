@@ -1,11 +1,9 @@
-// let cleanActivityRanges  = require('./actions/cleanActivityRanges')
-// let cleanActivityLogs    = require('./actions/cleanActivityLogs')
 let refreshToonSchedules = require('./actions/refreshToonSchedules')
+let checkSseAndWebhooks  = require('./actions/checkSseAndWebhooks')
 
 let scheduledTasks = [
-  // {id:"activityRangeMaintenance", action: cleanActivityRanges,  everyNHours: "6" },
-  // {id:"activityLogMaintenance",   action: cleanActivityLogs,    everyNHours: "6" },
-  {id:"toonSchedule",             action: refreshToonSchedules, everyNHours: "24"},
+  {id:"toonSchedule", action: refreshToonSchedules, everyNHours: "24"},
+  {id:"SSE+Webhooks", action: checkSseAndWebhooks,  everyNHours: "1"},
 ];
 
 

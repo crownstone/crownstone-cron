@@ -10,46 +10,40 @@ let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
 const logger = require("./loggerInstance")
 
-function hourlyInvoke(forceExecute = false) {
-  logger.info(new Date().valueOf() + " Starting...", new Date().valueOf())
-  logger.once('connected', () => {
-    logger.info(new Date().valueOf() + " Connected...", new Date().valueOf())
-    util.promiseBatchPerformer(scheduledTasks, (task) => {
-      return evaluate(task, forceExecute)
-    })
-      .then(() => {
-        logger.info(new Date().valueOf() + " Ran successfully")
-        return fetch(config.snitchUrl + '?m=Successful', fetchConfig);
-      })
-      .catch((err) => {
-        logger.info(new Date().valueOf() + " Failing with errors")
-        logger.info(err)
-        return fetch(config.snitchUrl + '?m=Failed', fetchConfig);
-      })
-      .then(() => {
-        logger.info(new Date().valueOf() + " Shutting down logger");
-        logger.notice({ type: 'server', event: 'shutdown' });
-        logger.once('buffer drain', () => {
-          logger.closeConnection();
-          logger.on('disconnected', () => {
-            process.exit();
-          });
-        });
-      })
-  })
+async function hourlyInvoke(forceExecute = false) {
+  logger.info(new Date().valueOf() + " Starting...", new Date().valueOf());
+  logger.once('connected',    ()    => { runTasks(60, forceExecute);});
+  logger.once('error',        (err) => { console.log("error", err);     });
+  logger.once('disconnected', (err) => { console.log("disconnected");   });
+  logger.once('timed out',    (err) => { console.log("timed out", err); });
+}
 
-  logger.once('error', (err) => {
-    console.log("error", err)
-  })
+async function runTasks(invocationIntervalMins, forceExecute) {
+  logger.info(new Date().valueOf() + " Connected...", new Date().valueOf())
 
-  logger.once('disconnected', (err) => {
-    console.log("disconnected")
-  })
+  try {
+    // run all tasks one by one.
+    for (let task of scheduledTasks) {
+      await evaluate(task, invocationIntervalMins, forceExecute);
+    }
 
- logger.once('timed out', (err) => {
-    console.log("timed out", err)
-  })
+    logger.info(new Date().valueOf() + " Ran successfully")
+    await fetch(config.snitchUrl + '?m=Successful', fetchConfig);
+  }
+  catch (err) {
+    logger.info(new Date().valueOf() + " Failing with errors")
+    logger.info(err)
+    await fetch(config.snitchUrl + '?m=Failed', fetchConfig);
+  }
 
+  logger.info(new Date().valueOf() + " Shutting down logger");
+  logger.notice({ type: 'server', event: 'shutdown' });
+  logger.once('buffer drain', () => {
+    logger.closeConnection();
+    logger.on('disconnected', () => {
+      process.exit();
+    });
+  });
 }
 
 module.exports = hourlyInvoke;

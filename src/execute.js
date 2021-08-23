@@ -1,8 +1,8 @@
 let MongoDbConnector = require('./MongoDbConnector');
-let config           = require('./config/config.' + (process.env.NODE_ENV || 'local'));
-const fetch          = require('node-fetch');
 
-const logger = require("./loggerInstance")
+const logger = require("./loggerInstance");
+
+let hourMs = 3600*1000;
 
 function execute(task) {
   logger.info(new Date().valueOf() + " ScheduledJob: Setting up execution of " +  task.id + "...");
@@ -19,26 +19,28 @@ function execute(task) {
     .catch((err) => {
       logger.err(new Date().valueOf() + " ScheduledJob: Failed: " + task.id);
       logger.err(err);
-      return mongo.close();
+      mongo.close();
+
+      throw err;
     })
 }
 
-function evaluate(task, forceExecute = false) {
-  return new Promise((resolve, reject) => {
-    let everyNHours = task.everyNHours;
-    let now = new Date().valueOf();
-    let timeSinceLastTrigger = (now % (everyNHours*3600000))
+async function evaluate(task, executionIntervalMins, forceExecute = false) {
+  let intervalMs = executionIntervalMins * 60 * 1000;
 
-    if (timeSinceLastTrigger < 3600000 || forceExecute) {
-      logger.info(new Date().valueOf() + " Executing task: " + task.id);
-      execute(task).then(() => { resolve() })
-    }
-    else {
-      logger.info(new Date().valueOf() + " Skipping task: " + task.id);
-      resolve();
-    }
-  })
+  let everyNHours = task.everyNHours;
+  let now = new Date().valueOf();
+  let timeSinceLastTrigger = (now % (everyNHours*hourMs));
 
+  // if the time since the last trigger is smaller or equal than the interval of the invocation
+  // that means that this is the invocation that will execute the task.
+  if (timeSinceLastTrigger <= intervalMs || forceExecute) {
+    logger.info(new Date().valueOf() + " Executing task: " + task.id);
+    await execute(task)
+  }
+  else {
+    logger.info(new Date().valueOf() + " Skipping task: " + task.id);
+  }
 }
 
 

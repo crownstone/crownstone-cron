@@ -232,6 +232,7 @@ const ToonAPI = {
         if (toonCloudReply.fault && typeof toonCloudReply.fault === 'object' &&
             toonCloudReply.fault.detail && typeof toonCloudReply.fault.detail === 'object') {
           if (
+            toonCloudReply.fault.detail.errorcode === "keymanagement.service.invalid_refresh_token" ||
             toonCloudReply.fault.detail.errorcode === "keymanagement.service.access_token_expired" ||
             toonCloudReply.fault.detail.errorcode === "keymanagement.service.invalid_access_token") {
             return ToonAPI.checkForTokenRepair(mongo, tokens)
