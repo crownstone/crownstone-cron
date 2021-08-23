@@ -110,14 +110,14 @@ async function checkSseAndWebhooks(mongo) {
 
     let now = Date.now();
     logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on SSE...");
-    while (Date.now() - now < 3000 && checker.sse === false) {
+    while (Date.now() - now < config.waitTime && checker.sse === false) {
       Util.wait(100);
     }
     if (checker.sse === false) { throw "NO_SSE_RECEIVED"; }
 
     logger.info(new Date().valueOf() + " SseAndWebhooks: SSE received.");
     logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on Hook...");
-    while (Date.now() - now < 3000 && checker.hook === false) {
+    while (Date.now() - now < config.waitTime && checker.hook === false) {
       Util.wait(100);
     }
 

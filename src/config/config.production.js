@@ -40,4 +40,5 @@ module.exports = {
   hooksApiKey: process.env.WEBHOOK_API_KEY,
   hostname:    process.env.HOST_NAME,
   port:        process.env.PORT,
+  waitTime:    Number(process.env.HOOK_WAIT_TIME),
 };
