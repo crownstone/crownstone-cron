@@ -82,6 +82,7 @@ async function checkSseAndWebhooks(mongo) {
   const checker = new Checker()
   const server  = new ExpressServer(checker)
 
+  let error = null;
 
   try {
     logger.info(new Date().valueOf() + " SseAndWebhooks: Starting server...");
@@ -124,26 +125,20 @@ async function checkSseAndWebhooks(mongo) {
     if (checker.hook === false) { throw "NO_HOOK_RECEIVED"; }
 
     logger.info(new Date().valueOf() + " SseAndWebhooks: HOOK received.");
-
-    logger.info(new Date().valueOf() + " SseAndWebhooks: shutting down server...");
-    await server.shutdown()
-    logger.info(new Date().valueOf() + " SseAndWebhooks: server shut down.");
   }
   catch(err) {
-    logger.info(new Date().valueOf() + " SseAndWebhooks: shutting down server...");
-    await server.shutdown()
-    logger.info(new Date().valueOf() + " SseAndWebhooks: server shut down.");
-
     console.log("Something went wrong... :(", err);
-    throw err;
+    error = err;
   }
 
-  logger.info(new Date().valueOf() + " SseAndWebhooks: Stopping SSE...");
+  logger.info(new Date().valueOf() + " SseAndWebhooks: shutting down server and SSE...");
   await sse.stop();
-  logger.info(new Date().valueOf() + " SseAndWebhooks: SSE stopped.");
+  await server.shutdown()
+  logger.info(new Date().valueOf() + " SseAndWebhooks: server shut and SSE down.");
 
-
-
+  if (error !== null) {
+    throw error;
+  }
 }
 
 
