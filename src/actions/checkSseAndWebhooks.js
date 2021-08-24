@@ -42,7 +42,12 @@ async function checkSseAndWebhooks(mongo) {
 
   try {
     // ! wake server
-    await Util.post(config.hostname+'wake')
+    try {
+      await Util.post(config.hostname+'wake')
+    }
+    catch (err) {
+      logger.info(new Date().valueOf() + " SseAndWebhooks: Wakeup timeout handled...");
+    }
     // reset memory
     await Util.post(config.hostname+'reset')
 
