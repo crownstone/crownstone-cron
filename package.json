@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Cronjobs for the Crownstone Cloud",
   "author": "",
+  "scripts": {
+    "start": "./bin/server"
+  },
   "license": "MIT",
   "dependencies": {
     "le_node": "^1.7.1",
