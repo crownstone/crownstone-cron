@@ -9,6 +9,8 @@ class ExpressServer {
   server
   checker
 
+  memory = [];
+
   constructor(checker) {
     this.checker = checker
   }
@@ -21,13 +23,20 @@ class ExpressServer {
         extended: true
       }));
 
-      this.app.post('/', (req, res) => {
-        this.checker.handleHookEvent(req.body)
-        res.end('Done');
+      this.app.post('/hook', (req, res) => {
+        this.memory.push(req.body);
+        res.end(JSON.stringify({status:204}));
       })
-
-      this.app.get('/', (req, res) => {
-        res.end('Done');
+      this.app.post('/wake', (req, res) => {
+        this.memory = []
+        res.end(JSON.stringify({status:204}));
+      })
+      this.app.post('/reset', (req, res) => {
+        this.memory = []
+        res.end(JSON.stringify({status:204}));
+      })
+      this.app.get('/results', (req, res) => {
+        res.end(JSON.stringify({status:200, res: this.memory}));
       })
 
 

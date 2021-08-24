@@ -1,6 +1,5 @@
 const Util = require("../util/util")
 const logger = require("../loggerInstance")
-const ExpressServer = require("../util/express")
 const sseLib = require("crownstone-sse")
 const cloudLib = require("crownstone-cloud")
 
@@ -17,8 +16,9 @@ class Checker {
     }
   }
 
-  handleHookEvent(event) {
-    if (this._check(event.data)) {
+  async pollHookEvent() {
+    let results = await Util.get(config.hostname+'results');
+    if (this._check(results?.res[0]?.data)) {
       this.hook = true;
     }
   }
@@ -37,14 +37,14 @@ async function checkSseAndWebhooks(mongo) {
   const cloud   = new cloudLib.CrownstoneCloud();
   const hooks   = new cloudLib.CrownstoneWebhooks(config.customHookEndpoint);
   const checker = new Checker()
-  const server  = new ExpressServer(checker)
 
   let error = null;
 
   try {
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Starting server...");
-    await server.run()
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Server started.");
+    // ! wake server
+    await Util.post(config.hostname+'wake')
+    // reset memory
+    await Util.post(config.hostname+'reset')
 
     // we will login to the Crownstone cloud to obtain an accessToken.
     // It will be set automatically after successful login.
@@ -56,7 +56,7 @@ async function checkSseAndWebhooks(mongo) {
     logger.info(new Date().valueOf() + " SseAndWebhooks: Create listener...");
     hooks.setApiKey(config.hooksApiKey);
     await hooks.removeListenerByUserId(data.userId);
-    await hooks.createListener(data.userId, data.accessToken, ["command"], config.hostname);
+    await hooks.createListener(data.userId, data.accessToken, ["command"], config.hostname+'hook');
     logger.info(new Date().valueOf() + " SseAndWebhooks: Listener Created.");
 
     // now that we have an accessToken, we can start the eventstream.
@@ -75,8 +75,11 @@ async function checkSseAndWebhooks(mongo) {
 
     logger.info(new Date().valueOf() + " SseAndWebhooks: SSE received.");
     logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on Hook...");
+    await checker.pollHookEvent();
+
     while (Date.now() - now < config.waitTime && checker.hook === false) {
-      await Util.wait(100);
+      await Util.wait(500);
+      await checker.pollHookEvent();
     }
 
     if (checker.hook === false) { throw "NO_HOOK_RECEIVED"; }
@@ -90,7 +93,6 @@ async function checkSseAndWebhooks(mongo) {
 
   logger.info(new Date().valueOf() + " SseAndWebhooks: shutting down server and SSE...");
   await sse.stop();
-  await server.shutdown()
   logger.info(new Date().valueOf() + " SseAndWebhooks: server shut and SSE down.");
 
   if (error !== null) {

@@ -1,3 +1,4 @@
+const fetch = require("node-fetch");
 
 const Util = {
   promiseBatchPerformer: function(arr, method) {
@@ -29,7 +30,39 @@ const Util = {
     return new Promise((resolve, reject) => {
       setTimeout(() => { resolve() }, ms);
     })
+  },
+
+  post: function(endpoint, timeoutSeconds= 2) {
+    return request("POST", endpoint, timeoutSeconds)
+  },
+
+  get: function(endpoint, timeoutSeconds= 2) {
+    return request("GET", endpoint, timeoutSeconds)
   }
+
 }
 
 module.exports = Util;
+
+function request(method, endpoint, timeoutSeconds= 2) {
+  return new Promise((resolve, reject) => {
+    let config = {method: method};
+
+    let timeout = setTimeout(() => {
+      reject("TIMEOUT")
+    }, timeoutSeconds*1000)
+
+    fetch(endpoint, config)
+      .then((res) => {
+        return res.json()
+      })
+      .then((json) => {
+        clearTimeout(timeout)
+        resolve(json)
+      })
+      .catch((err) => {
+        clearTimeout(timeout)
+        reject(err);
+      })
+  })
+}
