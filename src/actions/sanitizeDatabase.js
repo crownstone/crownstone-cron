@@ -1,5 +1,5 @@
 const logger = require("../loggerInstance")
-
+const fetch  = require('node-fetch');
 
 async function sanitizeDatabase() {
   logger.info(new Date().valueOf() + " SanitizeDatabase: starting...");
