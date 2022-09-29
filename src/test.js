@@ -1,6 +1,3 @@
-#!/usr/bin/env node
+let MongoDbConnector = require('./MongoDbConnector');
 
-const hourlyInvoke = require("./hourlyInvoke");
-
-// run my invocation!
-hourlyInvoke(true);
+let connector = new MongoDbConnector();

@@ -31,7 +31,7 @@ class Checker {
   }
 }
 
-async function checkSseAndWebhooks(mongo) {
+async function checkSseAndWebhooks() {
   // initialize the library
   const sse     = new sseLib.CrownstoneSSE();
   const cloud   = new cloudLib.CrownstoneCloud();

@@ -41,4 +41,12 @@ module.exports = {
   hostname:    process.env.HOST_NAME,
   port:        process.env.PORT,
   waitTime:    Number(process.env.HOOK_WAIT_TIME),
+
+  cronMongo:{
+    url:  process.env.MONGO_CRON_URL,
+    name: process.env.MONGO_CRON_DB_NAME,
+  },
+
+  aggregationToken: process.env.AGGREGATION_TOKEN,
+  sanitationToken:  process.env.SANITATION_TOKEN,
 };
