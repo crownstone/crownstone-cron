@@ -1,5 +1,4 @@
 const Util = require("../util/util")
-const logger = require("../loggerInstance")
 const sseLib = require("crownstone-sse")
 const cloudLib = require("crownstone-cloud")
 
@@ -46,40 +45,40 @@ async function checkSseAndWebhooks() {
       await Util.post(config.hostname+'wake')
     }
     catch (err) {
-      logger.info(new Date().valueOf() + " SseAndWebhooks: Wakeup timeout handled...");
+      console.log(new Date().valueOf() + " SseAndWebhooks: Wakeup timeout handled...");
     }
     // reset memory
     await Util.post(config.hostname+'reset')
 
     // we will login to the Crownstone cloud to obtain an accessToken.
     // It will be set automatically after successful login.
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Logging in...");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Logging in...");
     let data = await cloud.login(config.crownstoneUsername , config.crownstonePassword );
     sse.setAccessToken(data.accessToken);
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Logged in.");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Logged in.");
 
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Create listener...");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Create listener...");
     hooks.setApiKey(config.hooksApiKey);
     await hooks.removeListenerByUserId(data.userId);
     await hooks.createListener(data.userId, data.accessToken, ["command"], config.hostname+'hook');
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Listener Created.");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Listener Created.");
 
     // now that we have an accessToken, we can start the eventstream.
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Connecting...");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Connecting...");
     await sse.start((event) => { checker.handleSseEvent(event); });
     console.log("Let's get started!");
 
     await cloud.crownstone(config.virtualCrownstoneId).turnOn()
 
     let now = Date.now();
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on SSE...");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Waiting on SSE...");
     while (Date.now() - now < config.waitTime && checker.sse === false) {
       await Util.wait(100);
     }
     if (checker.sse === false) { throw "NO_SSE_RECEIVED"; }
 
-    logger.info(new Date().valueOf() + " SseAndWebhooks: SSE received.");
-    logger.info(new Date().valueOf() + " SseAndWebhooks: Waiting on Hook...");
+    console.log(new Date().valueOf() + " SseAndWebhooks: SSE received.");
+    console.log(new Date().valueOf() + " SseAndWebhooks: Waiting on Hook...");
     await checker.pollHookEvent();
 
     while (Date.now() - now < config.waitTime && checker.hook === false) {
@@ -89,16 +88,16 @@ async function checkSseAndWebhooks() {
 
     if (checker.hook === false) { throw "NO_HOOK_RECEIVED"; }
 
-    logger.info(new Date().valueOf() + " SseAndWebhooks: HOOK received.");
+    console.log(new Date().valueOf() + " SseAndWebhooks: HOOK received.");
   }
   catch(err) {
     console.log("Something went wrong... :(", err);
     error = err;
   }
 
-  logger.info(new Date().valueOf() + " SseAndWebhooks: shutting down server and SSE...");
+  console.log(new Date().valueOf() + " SseAndWebhooks: shutting down server and SSE...");
   await sse.stop();
-  logger.info(new Date().valueOf() + " SseAndWebhooks: server shut and SSE down.");
+  console.log(new Date().valueOf() + " SseAndWebhooks: server shut and SSE down.");
 
   if (error !== null) {
     throw error;

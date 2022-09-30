@@ -1,6 +1,4 @@
 const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
-const logger = require("./loggerInstance")
 
 class MongoDbConnector {
 
@@ -19,7 +17,7 @@ class MongoDbConnector {
       MongoClient.connect(this.url, {useNewUrlParser:true}, (err, client) => {
         if ( err ) { return reject(err); }
 
-        logger.info(new Date().valueOf() + " ScheduledJob: Connected successfully to mongo server");
+        console.log(new Date().valueOf() + " ScheduledJob: Connected successfully to mongo server");
 
         this.db = client.db(this.name);
 

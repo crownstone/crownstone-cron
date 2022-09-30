@@ -8,28 +8,21 @@ const fetch        = require('node-fetch');
 
 let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 
-const logger = require("./loggerInstance")
 const MongoDbConnector = require("./MongoDbConnector");
 
 
 async function Invoke(forceExecute = false) {
-  logger.info(new Date().valueOf() + " Starting...", new Date().valueOf());
-  logger.once('connected',    ()    => { runTasks(forceExecute);});
-  logger.once('error',        (err) => { console.log("error", err);     });
-  logger.once('disconnected', (err) => { console.log("disconnected");   });
-  logger.once('timed out',    (err) => { console.log("timed out", err); });
+  console.log(new Date().valueOf() + " Starting...", new Date().valueOf());
+  runTasks(forceExecute);
 }
 
 
 async function runTasks(forceExecute) {
-  console.log("Running")
   let mongo = new MongoDbConnector(config.cronMongo.url, config.cronMongo.name);
 
-  console.log("Connecting")
   await mongo.connect();
-  console.log("Connected")
 
-  logger.info(new Date().valueOf() + " Connected...", new Date().valueOf())
+  console.log(new Date().valueOf() + " Connected...", new Date().valueOf())
 
   try {
     // run all tasks one by one.
@@ -44,27 +37,19 @@ async function runTasks(forceExecute) {
         await setExecutionTime(mongo, id, task.id, new Date().valueOf());
       }
     }
-    logger.info(new Date().valueOf() + " Ran successfully")
+    console.log(new Date().valueOf() + " Ran successfully")
     await fetch(config.snitchUrl + '?m=Successful', fetchConfig);
   }
   catch (err) {
-    logger.info(new Date().valueOf() + " Failing with errors")
-    logger.info(err)
-    console.log("da,mn")
+    console.log(new Date().valueOf() + " Failing with errors")
+    console.log(err)
     await fetch(config.snitchUrl + '?m=Failed', fetchConfig);
   }
   finally {
     mongo.close();
   }
-  logger.info(new Date().valueOf() + " Shutting down logger");
-  logger.notice({ type: 'server', event: 'shutdown' });
-  logger.once('buffer drain', () => {
-    logger.closeConnection();
-    logger.on('disconnected', () => {
-
-      process.exit();
-    });
-  });
+  console.log(new Date().valueOf() + " Shutting down logger");
+  process.exit();
 }
 
 // dataformat:
