@@ -48,7 +48,7 @@ async function runTasks(forceExecute) {
   finally {
     mongo.close();
   }
-  console.log(new Date().valueOf() + " Shutting down logger");
+  console.log(new Date().valueOf() + " Shutting down");
   process.exit();
 }
 
