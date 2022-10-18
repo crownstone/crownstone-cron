@@ -1,6 +1,6 @@
 let util           = require('./util/util');
 let scheduledTasks = require('./scheduledTasks');
-let evaluate       = require('./execute');
+let execution      = require('./execute');
 
 const headers        = {'Content-Type': 'application/x-www-form-urlencoded'};
 const fetchConfig    = {method: 'GET', headers};
@@ -28,13 +28,19 @@ async function runTasks(forceExecute) {
     // run all tasks one by one.
     for (let task of scheduledTasks) {
       let lastExecution = await getLastExecutionForAction(mongo, task.id);
+      console.log("Last execution of task " + task.id + " was " + new Date(lastExecution[0]?.lastExecution));
       let id   = lastExecution.length > 0 ? lastExecution[0]._id : null;
       let time = lastExecution.length > 0 ? lastExecution[0].lastExecution : 0;
 
-      let didExecute = await evaluate(task, time, forceExecute);
+      let shouldExecute = execution.shouldTaskBeExecuted(task, time, forceExecute);
 
-      if (didExecute) {
+      if (shouldExecute) {
+        console.log(new Date().valueOf() + " Executing task: " + task.id);
+        await execution.execute(task);
         await setExecutionTime(mongo, id, task.id, new Date().valueOf());
+      }
+      else {
+        console.log("No need to execture task " + task.id + " now.");
       }
     }
     console.log(new Date().valueOf() + " Ran successfully")

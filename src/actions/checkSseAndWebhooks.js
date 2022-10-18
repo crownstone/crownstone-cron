@@ -32,8 +32,8 @@ class Checker {
 
 async function checkSseAndWebhooks() {
   // initialize the library
-  const sse     = new sseLib.CrownstoneSSE();
-  const cloud   = new cloudLib.CrownstoneCloud();
+  const sse     = new sseLib.CrownstoneSSE(config.customSseEndpoint);
+  const cloud   = new cloudLib.CrownstoneCloud(config.customCloudEndpoint);
   const hooks   = new cloudLib.CrownstoneWebhooks(config.customHookEndpoint);
   const checker = new Checker()
 

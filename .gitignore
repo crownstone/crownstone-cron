@@ -3,5 +3,3 @@ node_modules/
 
 *.local.*
 
-startJobs.sh
-startServer.sh
