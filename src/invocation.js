@@ -36,8 +36,12 @@ async function runTasks(forceExecute) {
 
       if (shouldExecute) {
         console.log(new Date().valueOf() + " Executing task: " + task.id);
-        await execution.execute(task);
-        await setExecutionTime(mongo, id, task.id, new Date().valueOf());
+        try {
+          await execution.execute(task);
+        }
+        finally {
+          await setExecutionTime(mongo, id, task.id, new Date().valueOf());
+        }
       }
       else {
         console.log("No need to execture task " + task.id + " now.");
