@@ -11,13 +11,13 @@ let config = require('./config/config.' + (process.env.NODE_ENV || 'local'));
 const MongoDbConnector = require("./MongoDbConnector");
 
 
-async function Invoke(forceExecute = false) {
+async function Invoke(forceExecute = false, local = false) {
   console.log(new Date().valueOf() + " Starting...", new Date().valueOf());
-  runTasks(forceExecute);
+  runTasks(forceExecute, local);
 }
 
 
-async function runTasks(forceExecute) {
+async function runTasks(forceExecute, local) {
   let mongo = new MongoDbConnector(config.cronMongo.url, config.cronMongo.name);
 
   await mongo.connect();
@@ -27,6 +27,8 @@ async function runTasks(forceExecute) {
   try {
     // run all tasks one by one.
     for (let task of scheduledTasks) {
+      if (local === true && task.local === false) { continue; }
+
       let lastExecution = await getLastExecutionForAction(mongo, task.id);
       console.log("Last execution of task " + task.id + " was " + new Date(lastExecution[0]?.lastExecution));
       let id   = lastExecution.length > 0 ? lastExecution[0]._id : null;
@@ -48,12 +50,16 @@ async function runTasks(forceExecute) {
       }
     }
     console.log(new Date().valueOf() + " Ran successfully")
-    await fetch(config.snitchUrl + '?m=Successful', fetchConfig);
+    if (config.snitchUrl) {
+      await fetch(config.snitchUrl + '?m=Successful', fetchConfig);
+    }
   }
   catch (err) {
     console.log(new Date().valueOf() + " Failing with errors")
     console.log(err)
-    await fetch(config.snitchUrl + '?m=Failed', fetchConfig);
+    if (config.snitchUrl) {
+      await fetch(config.snitchUrl + '?m=Failed', fetchConfig);
+    }
   }
   finally {
     mongo.close();

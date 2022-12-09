@@ -5,11 +5,11 @@ const aggregateEnergyData   = require("./actions/aggregateEnergyData");
 const garbageCollectData   = require("./actions/garbageCollectData");
 
 let scheduledTasks = [
-  {id:"garbageCollectData",   action: garbageCollectData,   everyNHours: "1"},
-  {id:"aggregateEnergyUsage", action: aggregateEnergyData,  everyNHours: "0.5"},
-  {id:"sanitizeDatabase",     action: sanitizeDatabase,     everyNHours: "12"},
-  {id:"toonSchedule",         action: refreshToonSchedules, everyNHours: "24"},
-  {id:"SSE+Webhooks",         action: checkSseAndWebhooks,  everyNHours: "1"},
+  {id:"garbageCollectData",   action: garbageCollectData,   local:true,  everyNHours: "1"},
+  {id:"aggregateEnergyUsage", action: aggregateEnergyData,  local:true,  everyNHours: "0.5"},
+  {id:"sanitizeDatabase",     action: sanitizeDatabase,     local:true,  everyNHours: "12"},
+  {id:"toonSchedule",         action: refreshToonSchedules, local:true,  everyNHours: "24"},
+  {id:"SSE+Webhooks",         action: checkSseAndWebhooks,  local:false, everyNHours: "1"},
 ];
 
 
